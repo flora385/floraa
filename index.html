@@ -407,22 +407,26 @@ body{
 </div>
 
 <script>
-/* 🎟 티켓 종이 출력 로직
+/* 🎟 티켓 종이 출력 로직 (수정 버전)
    - 세션당 5초
-   - 아무리 빨리 눌러도 최대 10개
-   - 보통은 5~6개
-   - 세션 시작할 때 엽전 -1
+   - 연타 많이 해야 최대 10줄, 보통 4~6줄
+   - 노멀~빂슈(일노/룸노/행노/빂노/레어/스페셜/빂슈)는
+     한 세션에 대부분 1~2개, 아주 드물게 3개
+   - 나머지는 꽝/음식/엽전(+1,+2)
+   - 티켓에서 '엽전+숫자'가 나오면 코인 즉시 누적
 */
 
 let tapping = false;
-let tapList = [];
+let tapList = [];          // { text, coin }
 let longTicket = null;
 
 let tapGauge = 0;
 let lastSpawn = 0;
+let tapCountTotal = 0;
+let premiumCount = 0;      // 노멀~빂슈 개수
 
-const SESSION_MS   = 5000;     // 세션 길이 5초
-const MIN_INTERVAL = 260;      // 줄 추가 최소 간격
+const SESSION_MS   = 5000; // 세션 길이 5초
+const MIN_INTERVAL = 300;  // 줄 추가 최소 간격
 
 const timeArea = document.getElementById("timeArea");
 const timeBar  = document.getElementById("timeBar");
@@ -478,7 +482,7 @@ function createLongTicket(){
     document.querySelector(".ticket-body").appendChild(longTicket);
 }
 
-/* 줄 추가 (최대 10개 제한) */
+/* 줄 추가 (최대 10줄) */
 function extendLongTicket(text){
     if(!longTicket) return;
     if(tapList.length >= 10) return;
@@ -488,6 +492,78 @@ function extendLongTicket(text){
     line.innerText = "🎟 " + text;
 
     longTicket.appendChild(line);
+}
+
+/* 낮은 등급만 뽑는 보상 (꽝/음식/엽전용) */
+function getLowReward(){
+    const r = Math.random();
+    if (r < 0.55){ // 55% 꽝
+        return { text:"꽝", coin:0, premium:false };
+    } else if (r < 0.80){ // 25% 음식
+        return { text:"음식", coin:0, premium:false };
+    } else { // 20% 엽전
+        const cRoll = Math.random();
+        const amount = cRoll < 0.7 ? 1 : 2; // 70% +1, 30% +2
+        return { text:`엽전+${amount}`, coin:amount, premium:false };
+    }
+}
+
+/* 전체 확률표
+   - 꽝:   40%
+   - 음식: 15%
+   - 엽전: 25% (엽전+1 / 엽전+2)
+   - 노멀:  9% (일노/룸노/행노/빂노, 일노·빂노 가중치↑)
+   - 레어:  5%
+   - 스페셜(랜템/입/멜로디): 3.5%
+   - 일슈: 2%
+   - 빂슈: 0.5% (가장 희귀)
+*/
+function getTicketReward(){
+    const roll = Math.random();
+
+    // 40% 꽝
+    if (roll < 0.40){
+        return { text:"꽝", coin:0, premium:false };
+    }
+    // 15% 음식
+    if (roll < 0.55){
+        return { text:"음식", coin:0, premium:false };
+    }
+    // 25% 엽전
+    if (roll < 0.80){
+        const cRoll = Math.random();
+        const amount = cRoll < 0.7 ? 1 : 2;
+        return { text:`엽전+${amount}`, coin:amount, premium:false };
+    }
+    // 9% 노멀 (일노 / 룸노 / 행노 / 빂노, 일노·빂노 가중치↑)
+    if (roll < 0.89){
+        const normalPool = [
+            "일노","일노","일노",
+            "룸노",
+            "행노",
+            "빂노","빂노"
+        ];
+        const text = normalPool[Math.floor(Math.random()*normalPool.length)];
+        return { text, coin:0, premium:true };
+    }
+    // 5% 레어
+    if (roll < 0.94){
+        const rarePool = ["일레","행레","룸레","빂레","빂레"];
+        const text = rarePool[Math.floor(Math.random()*rarePool.length)];
+        return { text, coin:0, premium:true };
+    }
+    // 3.5% 스페셜 (랜템/입/멜로디)
+    if (roll < 0.975){
+        const spPool = ["랜템","입","멜로디","랜템","입"];
+        const text = spPool[Math.floor(Math.random()*spPool.length)];
+        return { text, coin:0, premium:true };
+    }
+    // 2% 일슈
+    if (roll < 0.995){
+        return { text:"일슈", coin:0, premium:true };
+    }
+    // 0.5% 빂슈
+    return { text:"빂슈", coin:0, premium:true };
 }
 
 /* 버튼 클릭 */
@@ -514,10 +590,12 @@ document.getElementById("tapBtn").onclick = () => {
             if(ticketBox) ticketBox.innerText = `엽전 : ${coins}개`;
         }
 
-        tapping   = true;
-        tapList   = [];
-        tapGauge  = 0;
-        lastSpawn = 0;
+        tapping        = true;
+        tapList        = [];
+        tapGauge       = 0;
+        lastSpawn      = 0;
+        tapCountTotal  = 0;
+        premiumCount   = 0;
 
         createLongTicket();
         startGauge();
@@ -531,17 +609,34 @@ document.getElementById("tapBtn").onclick = () => {
         return;
     }
 
+    // 이미 10줄이면 더 안 나옴
     if (tapList.length >= 10) return;
 
-    tapGauge += 1;
+    tapGauge++;
+    tapCountTotal++;
 
     // 4연타 + 최소 간격 만족해야 한 줄 추가
-    if (tapGauge >= 4 && (now - lastSpawn) > MIN_INTERVAL) {
+    if (tapGauge >= 7 && (now - lastSpawn) > MIN_INTERVAL) {
         lastSpawn = now;
         tapGauge  = 0;
 
         if (tapList.length < 10) {
-            const reward = getTicketReward();
+            let reward = getTicketReward();
+
+            // 노멀~빂슈 개수 제한: 보통 1~2개, 드물게 3개
+            if (reward.premium){
+                const allowThird =
+                    (premiumCount === 2 && Math.random() < 0.15); // 15% 정도만 3개 허용
+
+                if (premiumCount >= 2 && !allowThird){
+                    // 이미 2개면 낮은 등급(꽝/음식/엽전)으로 강등
+                    const low = getLowReward();
+                    reward = low;
+                } else {
+                    premiumCount++;
+                }
+            }
+
             tapList.push(reward);
             extendLongTicket("????");
         }
@@ -566,12 +661,23 @@ function finishLongTicket(){
     box.className = "result-box";
     box.innerHTML = "<b>🎟 이번에 나온 티켓</b><br><br>";
 
+    let bonusCoins = 0;
+
     if(tapList.length === 0){
         box.innerHTML += "이번에는 티켓이 안 나왔어요..! 😢<br>";
     } else {
         tapList.forEach((r,i)=>{
-            box.innerHTML += `${i+1}) ${r}<br>`;
+            box.innerHTML += `${i+1}) ${r.text}<br>`;
+            if (r.coin){
+                bonusCoins += r.coin;
+            }
         });
+    }
+
+    if (bonusCoins > 0){
+        coins += bonusCoins;
+        localStorage.setItem("coins", coins);
+        box.innerHTML += `<br><span style="color:#F7D93A;">엽전 보너스 : +${bonusCoins}개</span><br>`;
     }
 
     const close = document.createElement("div");
@@ -584,45 +690,16 @@ function finishLongTicket(){
             longTicket.remove();
             longTicket = null;
         }
+        // 티켓/짱깨뽀 엽전 표시 동기화
+        const rpsBox    = document.getElementById("coinBoxRPS");
+        const ticketBox = document.getElementById("coinBoxTicket");
+        if(rpsBox)    rpsBox.innerText    = `엽전 : ${coins}개`;
+        if(ticketBox) ticketBox.innerText = `엽전 : ${coins}개`;
     };
 
     modal.appendChild(box);
     modal.appendChild(close);
     document.body.appendChild(modal);
-}
-
-/* 🎯 확률표
-   - 꽝: 60% (절반 확실히 넘음)
-   - 음식: 18%
-   - 일반: 13%
-   - 레어: 7.5%
-   - 스페셜: 1%
-   - 빂슈: 0.5% (200번에 1개 느낌)
-*/
-function getTicketReward(){
-    const roll = Math.random(); // 0 ~ 1
-
-    if (roll < 0.60) {
-        return "꽝";                             // 60%
-    } 
-    else if (roll < 0.78) {
-        return "음식";                           // 18%
-    } 
-    else if (roll < 0.91) {
-        const normal = ["일노","룸노","행노","빂노"];
-        return normal[Math.floor(Math.random()*normal.length)]; // 13%
-    }
-    else if (roll < 0.985) {
-        const rare = ["일레","행레","룸레","빂레"];
-        return rare[Math.floor(Math.random()*rare.length)];     // 7.5%
-    }
-    else if (roll < 0.995) {
-        const special = ["랜템","입","멜로디","일슈"];
-        return special[Math.floor(Math.random()*special.length)]; // 1%
-    }
-    else {
-        return "빂슈";                         // 0.5%
-    }
 }
 </script>
 
@@ -705,7 +782,7 @@ function getTicketReward(){
     width:42%;
     aspect-ratio:1/1;
     border-radius:50%;
-    background:#000; /* 청록 → 검정 */
+    background:#000;
     box-shadow:inset 0 0 1.4vw rgba(0,0,0,.7),
                0 0 2vw rgba(0,0,0,.7);
     display:flex;
