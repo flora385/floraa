@@ -62,27 +62,55 @@ body{
 
 /* 메뉴 화면 */
 #screen-menu .menu-title{
-    color:white;
-    font-size:5vw;
+    color:#7ffeff;
+    font-size:6vw;
     margin-bottom:5vh;
-    text-shadow:0 0 1vw #0ff;
+    text-shadow:0 0 1.5vw #00eaff;
 }
 
-.menu-btn{
-    width:70vw;
+/* 버튼 공통 (메뉴 / 충전 둘 다 사용) */
+.menu-btn,
+.charge-btn{
+    width:75vw;
     padding:5vw 0;
-    border-radius:3vw;
-    border:1vw solid white;
-    margin:2vh 0;
-    font-size:4vw;
+    border-radius:4vw;
+    margin:2.8vh auto;
+    font-size:4.5vw;
     text-align:center;
     cursor:pointer;
-    text-shadow:0 0 .8vw black;
+    color:white;
+    font-weight:600;
+
+    box-shadow:
+        0 0 12px rgba(255,255,255,0.4),
+        0 0 20px rgba(0,0,0,0.45),
+        inset 0 0 10px rgba(255,255,255,0.2);
+
+    border:0.9vw solid rgba(255,255,255,0.8);
+    backdrop-filter:blur(2px);
+    transition:transform .15s, box-shadow .15s;
 }
-.menu-ticket{ background:#FFD93A; color:black; }
-.menu-rps{ background:#FF3A3A; color:white; }
-.menu-coupon{ background:#4A90E2; color:white; }
-.menu-charge{ background:#4CAF50; color:white; }
+.menu-btn:active,
+.charge-btn:active{
+    transform:scale(0.96);
+    box-shadow:
+        0 0 4px rgba(255,255,255,0.3),
+        inset 0 0 10px rgba(0,0,0,0.3);
+}
+
+/* 메뉴 버튼별 색 */
+.menu-ticket{ 
+    background:linear-gradient(180deg,#ffec7d,#ffc938);
+}
+.menu-rps{ 
+    background:linear-gradient(180deg,#ff6b6b,#ff2e2e);
+}
+.menu-coupon{ 
+    background:linear-gradient(180deg,#7ec5ff,#4698ff);
+}
+.menu-charge{ 
+    background:linear-gradient(180deg,#91ff9c,#47d55e);
+}
 
 /* 뒤로 버튼 */
 .back-global{
@@ -108,19 +136,30 @@ body{
     <div class="start-btn" id="btnStart">GAME START</div>
 </div>
 
-<!-- 메뉴 -->
+<!-- 메뉴 화면 -->
 <div id="screen-menu" class="screen">
     <div class="menu-title">메뉴 선택</div>
 
-    <div class="menu-btn menu-ticket" onclick="goScreen('ticket')">🎟 랜덤 티켓 뽑기</div>
-    <div class="menu-btn menu-rps" onclick="goScreen('rps')">✊ 짱깨뽀 게임</div>
-    <div class="menu-btn menu-coupon" onclick="goScreen('coupon')">🎫 응모권 교환</div>
-    <div class="menu-btn menu-charge" onclick="goScreen('charge')">🔋 엽전 충전센터</div>
+    <div class="menu-btn menu-ticket" onclick="goScreen('ticket')">
+        🎫 랜덤 티켓 뽑기
+    </div>
+
+    <div class="menu-btn menu-rps" onclick="goScreen('rps')">
+        ✊ 짱깨뽀 게임
+    </div>
+
+    <div class="menu-btn menu-coupon" onclick="goScreen('coupon')">
+        🎫 응모권 교환
+    </div>
+
+    <div class="menu-btn menu-charge" onclick="goScreen('charge')">
+        🔋 엽전 충전센터
+    </div>
 </div>
 
 
 <!-- ========================== -->
-<!-- 🎟 티켓 뽑기 화면 (문방구 기계 스타일) -->
+<!-- 🎟 티켓 뽑기 화면 -->
 <!-- ========================== -->
 
 <style>
@@ -187,7 +226,7 @@ body{
     overflow:visible;
 }
 
-/* 티켓 입구 슬롯 (가로로 길게) */
+/* 티켓 입구 슬롯 */
 .ticket-exit{
     position:absolute;
     top:9%;
@@ -217,7 +256,7 @@ body{
     opacity:.8;
 }
 
-/* 시간 + LED 영역 (우측 상단) */
+/* 시간 + LED 영역 */
 .time-area{
     position:absolute;
     top:4%;
@@ -265,7 +304,7 @@ body{
     100%{opacity:.5; transform:scale(0.97);}
 }
 
-/* 길게 이어지는 종이 (슬롯 아래에서 나옴) */
+/* 종이 */
 .long-ticket {
     position:absolute;
     top:14%;
@@ -282,8 +321,6 @@ body{
     padding:2.5vw 3vw;
     animation:paperDrop 5s cubic-bezier(.22,.68,.42,1) forwards;
 }
-
-/* 종이가 아래로 천천히 내려오는 애니메이션 */
 @keyframes paperDrop{
     0%   { opacity:0; transform:translate(-50%, -25%) rotate(0deg); }
     18%  { opacity:1; transform:translate(-50%, 0%)  rotate(0.3deg); }
@@ -391,7 +428,6 @@ body{
         <div class="ticket-body">
             <div class="ticket-exit"></div>
 
-            <!-- 입구 오른쪽 시간 + LED -->
             <div class="time-area" id="timeArea">
                 <div class="time-bar-wrap">
                     <div class="time-bar-inner" id="timeBar"></div>
@@ -407,33 +443,25 @@ body{
 </div>
 
 <script>
-/* 🎟 티켓 종이 출력 로직 (수정 버전)
-   - 세션당 5초
-   - 연타 많이 해야 최대 10줄, 보통 4~6줄
-   - 노멀~빂슈(일노/룸노/행노/빂노/레어/스페셜/빂슈)는
-     한 세션에 대부분 1~2개, 아주 드물게 3개
-   - 나머지는 꽝/음식/엽전(+1,+2)
-   - 티켓에서 '엽전+숫자'가 나오면 코인 즉시 누적
-*/
+/* 티켓 출력 로직 */
 
 let tapping = false;
-let tapList = [];          // { text, coin }
+let tapList = [];
 let longTicket = null;
 
 let tapGauge = 0;
 let lastSpawn = 0;
 let tapCountTotal = 0;
-let premiumCount = 0;      // 노멀~빂슈 개수
+let premiumCount = 0;
 
-const SESSION_MS   = 5000; // 세션 길이 5초
-const MIN_INTERVAL = 300;  // 줄 추가 최소 간격
+const SESSION_MS   = 5000;
+const MIN_INTERVAL = 300;
 
 const timeArea = document.getElementById("timeArea");
 const timeBar  = document.getElementById("timeBar");
 let gaugeStartTime = 0;
 let gaugeRAF = null;
 
-/* 게이지 시작 */
 function startGauge(){
     gaugeStartTime = performance.now();
     timeArea.style.display = "flex";
@@ -459,7 +487,6 @@ function startGauge(){
     gaugeRAF = requestAnimationFrame(loop);
 }
 
-/* 세션 초기화 */
 function resetTicketSession(){
     if (longTicket) {
         longTicket.remove();
@@ -469,7 +496,6 @@ function resetTicketSession(){
     modals.forEach(m => m.remove());
 }
 
-/* 종이 생성 */
 function createLongTicket(){
     longTicket = document.createElement("div");
     longTicket.className = "long-ticket";
@@ -482,7 +508,6 @@ function createLongTicket(){
     document.querySelector(".ticket-body").appendChild(longTicket);
 }
 
-/* 줄 추가 (최대 10줄) */
 function extendLongTicket(text){
     if(!longTicket) return;
     if(tapList.length >= 10) return;
@@ -494,48 +519,34 @@ function extendLongTicket(text){
     longTicket.appendChild(line);
 }
 
-/* 낮은 등급만 뽑는 보상 (꽝/음식/엽전용) */
 function getLowReward(){
     const r = Math.random();
-    if (r < 0.55){ // 55% 꽝
+    if (r < 0.55){
         return { text:"꽝", coin:0, premium:false };
-    } else if (r < 0.80){ // 25% 음식
+    } else if (r < 0.80){
         return { text:"음식", coin:0, premium:false };
-    } else { // 20% 엽전
+    } else {
         const cRoll = Math.random();
-        const amount = cRoll < 0.7 ? 1 : 2; // 70% +1, 30% +2
+        const amount = cRoll < 0.7 ? 1 : 2;
         return { text:`엽전+${amount}`, coin:amount, premium:false };
     }
 }
 
-/* 전체 확률표
-   - 꽝:   40%
-   - 음식: 15%
-   - 엽전: 25% (엽전+1 / 엽전+2)
-   - 노멀:  9% (일노/룸노/행노/빂노, 일노·빂노 가중치↑)
-   - 레어:  5%
-   - 스페셜(랜템/입/멜로디): 3.5%
-   - 일슈: 2%
-   - 빂슈: 0.5% (가장 희귀)
-*/
+/* 확률표 */
 function getTicketReward(){
     const roll = Math.random();
 
-    // 40% 꽝
     if (roll < 0.40){
         return { text:"꽝", coin:0, premium:false };
     }
-    // 15% 음식
     if (roll < 0.55){
         return { text:"음식", coin:0, premium:false };
     }
-    // 25% 엽전
     if (roll < 0.80){
         const cRoll = Math.random();
         const amount = cRoll < 0.7 ? 1 : 2;
         return { text:`엽전+${amount}`, coin:amount, premium:false };
     }
-    // 9% 노멀 (일노 / 룸노 / 행노 / 빂노, 일노·빂노 가중치↑)
     if (roll < 0.89){
         const normalPool = [
             "일노","일노","일노",
@@ -546,43 +557,39 @@ function getTicketReward(){
         const text = normalPool[Math.floor(Math.random()*normalPool.length)];
         return { text, coin:0, premium:true };
     }
-    // 5% 레어
     if (roll < 0.94){
         const rarePool = ["일레","행레","룸레","빂레","빂레"];
         const text = rarePool[Math.floor(Math.random()*rarePool.length)];
         return { text, coin:0, premium:true };
     }
-    // 3.5% 스페셜 (랜템/입/멜로디)
     if (roll < 0.975){
         const spPool = ["랜템","입","멜로디","랜템","입"];
         const text = spPool[Math.floor(Math.random()*spPool.length)];
         return { text, coin:0, premium:true };
     }
-    // 2% 일슈
     if (roll < 0.995){
         return { text:"일슈", coin:0, premium:true };
     }
-    // 0.5% 빂슈
     return { text:"빂슈", coin:0, premium:true };
 }
 
-/* 버튼 클릭 */
+/* 티켓 버튼 */
 document.getElementById("tapBtn").onclick = () => {
     const now = Date.now();
 
-    // 첫 클릭 = 세션 시작
     if (!tapping) {
-        // 엽전 체크 (0이면 시작 불가)
-        if (typeof coins === "number" && coins <= 0){
-            alert("엽전이 부족합니다!");
+
+        // ▶ 엽전 2개 이상 필요
+        if (typeof coins === "number" && coins < 2){
+            alert("엽전이 2개 이상 있어야 합니다!");
             return;
         }
 
         resetTicketSession();
 
-        // 엽전 1개 소모
+        // ▶ 시작 시 엽전 -2
         if (typeof coins === "number"){
-            coins--;
+            coins -= 2;
             localStorage.setItem("coins", coins);
             const rpsBox    = document.getElementById("coinBoxRPS");
             const ticketBox = document.getElementById("coinBoxTicket");
@@ -609,13 +616,11 @@ document.getElementById("tapBtn").onclick = () => {
         return;
     }
 
-    // 이미 10줄이면 더 안 나옴
     if (tapList.length >= 10) return;
 
     tapGauge++;
     tapCountTotal++;
 
-    // 4연타 + 최소 간격 만족해야 한 줄 추가
     if (tapGauge >= 7 && (now - lastSpawn) > MIN_INTERVAL) {
         lastSpawn = now;
         tapGauge  = 0;
@@ -623,13 +628,11 @@ document.getElementById("tapBtn").onclick = () => {
         if (tapList.length < 10) {
             let reward = getTicketReward();
 
-            // 노멀~빂슈 개수 제한: 보통 1~2개, 드물게 3개
             if (reward.premium){
                 const allowThird =
-                    (premiumCount === 2 && Math.random() < 0.15); // 15% 정도만 3개 허용
+                    (premiumCount === 2 && Math.random() < 0.15);
 
                 if (premiumCount >= 2 && !allowThird){
-                    // 이미 2개면 낮은 등급(꽝/음식/엽전)으로 강등
                     const low = getLowReward();
                     reward = low;
                 } else {
@@ -643,7 +646,6 @@ document.getElementById("tapBtn").onclick = () => {
     }
 };
 
-/* 세션 종료 → 결과 공개 */
 function finishLongTicket(){
     tapping = false;
 
@@ -690,7 +692,6 @@ function finishLongTicket(){
             longTicket.remove();
             longTicket = null;
         }
-        // 티켓/짱깨뽀 엽전 표시 동기화
         const rpsBox    = document.getElementById("coinBoxRPS");
         const ticketBox = document.getElementById("coinBoxTicket");
         if(rpsBox)    rpsBox.innerText    = `엽전 : ${coins}개`;
@@ -705,7 +706,7 @@ function finishLongTicket(){
 
 
 <!-- ========================== -->
-<!-- ✊ 짱깨뽀 게임 (LED 이미지 버전) -->
+<!-- ✊ 짱깨뽀 게임 (원판 고정, LED만 회전) -->
 <!-- ========================== -->
 
 <style>
@@ -732,6 +733,7 @@ function finishLongTicket(){
     align-items:center;
 }
 
+/* 고정 보상 원판 */
 .rewards{
     position:relative;
     width:82%;
@@ -773,7 +775,7 @@ function finishLongTicket(){
 .n7{ top:40%; left:20%; transform:translateY(-50%); }
 .n8{ top:18%; left:37%; }
 
-/* LED 중앙 (검정 배경 + 이미지) */
+/* LED 중앙 */
 .led-box{
     position:absolute;
     top:50%;
@@ -821,12 +823,13 @@ function finishLongTicket(){
 .status-right{ right:-15vw; top:50%; transform:translateY(-50%); }
 .status-bottom{ bottom:-9vw; left:50%; transform:translateX(-50%); }
 .status-left{ left:-15vw; top:50%; transform:translateY(-50%); }
+
 .status-box.on{
     background:#ff3636;
     color:#fff;
 }
 
-/* 버튼 */
+/* 버튼 영역 */
 .buttons{
     position:absolute;
     bottom:3vh;
@@ -835,26 +838,43 @@ function finishLongTicket(){
     justify-content:center;
     gap:6vw;
 }
+
+/* 오락실 버튼 모양 */
 .btn{
     width:18vw;
     height:18vw;
     border-radius:50%;
-    border:3px solid #222;
+    border:0.9vw solid #222;
     display:flex;
     justify-content:center;
     align-items:center;
     font-size:4vw;
-    font-weight:700;
-    overflow:hidden;
+    font-weight:900;
+    color:#fff;
+    text-shadow:0 0.4vw 0 rgba(0,0,0,0.7);
+    box-shadow:
+        0 1.6vw 0 rgba(0,0,0,0.7),
+        0 0 1.8vw rgba(0,0,0,0.8),
+        inset 0 0 1vw rgba(255,255,255,0.2);
+    cursor:pointer;
+    transition:transform .08s, box-shadow .08s;
 }
-.btn img{
-    width:100%;
-    height:100%;
-    object-fit:cover;
+.btn:active{
+    transform:translateY(1vw) scale(.96);
+    box-shadow:
+        0 0.6vw 0 rgba(0,0,0,0.7),
+        0 0 1vw rgba(0,0,0,0.8),
+        inset 0 0 0.8vw rgba(255,255,255,0.1);
 }
-.red{ background:#d64545; }
-.green{ background:#3faf5b; }
-.yellow{ background:#e3c44a; }
+.red{
+    background:radial-gradient(circle at 30% 20%, #ffbcbc, #ff4a4a 45%, #8b0505 100%);
+}
+.green{
+    background:radial-gradient(circle at 30% 20%, #c6ffb5, #3ecf5a 45%, #0a6b21 100%);
+}
+.yellow{
+    background:radial-gradient(circle at 30% 20%, #fff3b8, #ffd84a 45%, #b08007 100%);
+}
 
 /* 엽전 표시 */
 .coin-box{
@@ -894,22 +914,17 @@ function finishLongTicket(){
             </div>
         </div>
 
-        <div class="status-box win status-top">이겼다!!</div>
-        <div class="status-box win status-right">이겼다!!</div>
-        <div class="status-box lose status-bottom">졌다 ㅠㅠ</div>
+        <!-- 텍스트만 승/패/무 표시 -->
+        <div class="status-box win status-top">이겼다 !</div>
+        <div class="status-box win status-right">이겼다 !</div>
+        <div class="status-box lose status-bottom">졌다 ㅜ</div>
         <div class="status-box draw status-left">비겼다 ..</div>
     </div>
 
     <div class="buttons">
-        <div class="btn red" onclick="startRPS('scissors')">
-            <img src="https://raw.githubusercontent.com/flora385/floraa/main/4F71DBB1-5807-4162-8DCC-5B36D430F756.png" alt="가위">
-        </div>
-        <div class="btn green" onclick="startRPS('rock')">
-            <img src="https://raw.githubusercontent.com/flora385/floraa/main/F658C9F7-99A3-4C79-9A34-DC9006FFAFD3.png" alt="바위">
-        </div>
-        <div class="btn yellow" onclick="startRPS('paper')">
-            <img src="https://raw.githubusercontent.com/flora385/floraa/main/901A7A3A-C1B2-42B0-BB82-37AF8475D435.png" alt="보">
-        </div>
+        <div class="btn red"   onclick="startRPS('scissors')">가위</div>
+        <div class="btn green" onclick="startRPS('rock')">바위</div>
+        <div class="btn yellow"onclick="startRPS('paper')">보</div>
     </div>
 </div>
 
@@ -930,13 +945,18 @@ if (savedDate !== todayKey){
     localStorage.setItem("coinDate", todayKey);
 }
 
-let coins = Number(localStorage.getItem("coins") || 10);
+let coins   = Number(localStorage.getItem("coins")   || 10);
 let coupons = Number(localStorage.getItem("coupons") || 0);
 
-document.getElementById("coinBoxRPS").innerText    = `엽전 : ${coins}개`;
-document.getElementById("coinBoxTicket").innerText = `엽전 : ${coins}개`;
+/* 화면에 초기 반영 */
+window.addEventListener("load", ()=>{
+    const rpsBox    = document.getElementById("coinBoxRPS");
+    const ticketBox = document.getElementById("coinBoxTicket");
+    if(rpsBox)    rpsBox.innerText    = `엽전 : ${coins}개`;
+    if(ticketBox) ticketBox.innerText = `엽전 : ${coins}개`;
+});
 
-/* LED 이미지 매핑 */
+/* LED 이미지 */
 const icons = {
     rock: "https://raw.githubusercontent.com/flora385/floraa/main/F658C9F7-99A3-4C79-9A34-DC9006FFAFD3.png",
     paper: "https://raw.githubusercontent.com/flora385/floraa/main/901A7A3A-C1B2-42B0-BB82-37AF8475D435.png",
@@ -945,22 +965,19 @@ const icons = {
 
 const ledImg = document.getElementById("ledImg");
 
-/* LED가 도는 순서 */
-const seq = ["rock","paper","scissors"];
-const mapTo = {
-    rock:"rock",
-    paper:"paper",
-    scissors:"scissors"
-};
+/* LED 회전 순서 (원판 고정) */
+const seq = ["scissors", "rock", "paper"];
 
-function judge(p,m){
-    if(p===m) return "draw";
-    if(p==="rock"&&m==="scissors") return "win";
-    if(p==="scissors"&&m==="paper") return "win";
-    if(p==="paper"&&m==="rock") return "win";
+/* 승패 판정 */
+function judge(p, m){
+    if(p === m) return "draw";
+    if(p==="rock" && m==="scissors") return "win";
+    if(p==="scissors" && m==="paper") return "win";
+    if(p==="paper" && m==="rock") return "win";
     return "lose";
 }
 
+/* 랜덤 보상 (이겼을 때만 사용) */
 function getRPSreward(){
     const r = Math.random();
     if(r < 0.42) return 2;
@@ -970,72 +987,103 @@ function getRPSreward(){
 }
 
 let spinningR = false;
+let currentFace = "rock"; // LED에 마지막으로 들어간 손 모양
 
+/* 엽전 표시 동기화 */
+function syncCoins(){
+    const rpsBox    = document.getElementById("coinBoxRPS");
+    const ticketBox = document.getElementById("coinBoxTicket");
+    if(rpsBox)    rpsBox.innerText    = `엽전 : ${coins}개`;
+    if(ticketBox) ticketBox.innerText = `엽전 : ${coins}개`;
+}
+
+/* 상태 박스 리셋 */
+function clearStatusBoxes(){
+    const boxes = document.querySelectorAll(".status-box");
+    boxes.forEach(b => b.classList.remove("on"));
+}
+
+/* RPS 시작 */
 function startRPS(player){
     if(spinningR) return;
 
-    if(coins<=0){
-        alert("엽전이 부족합니다!\n밤 12시 이후 초기화 되니 그때 다시 참여해주세요.");
+    if(coins <= 0){
+        alert("엽전이 부족합니다!");
         return;
     }
 
     spinningR = true;
-    coins--;
-    localStorage.setItem("coins",coins);
-    document.getElementById("coinBoxRPS").innerText    = `엽전 : ${coins}개`;
-    document.getElementById("coinBoxTicket").innerText = `엽전 : ${coins}개`;
+    clearStatusBoxes();
 
-    let idx=0,spd=60;
+    // 게임 시작 시 엽전 -1
+    coins--;
+    localStorage.setItem("coins", coins);
+    syncCoins();
+
+    let idx = 0;
+    let delay = 40;        // 더 빠르게 시작
+    let count = 0;
+    let maxCount = 25;     // 회전 길이
 
     function spin(){
-        // LED 이미지 회전
-        ledImg.src = icons[seq[idx]];
-        idx = (idx+1)%3;
-        spd += 45;
+        // LED 이미지 교체 (원판은 고정)
+        currentFace = seq[idx];
+        ledImg.src  = icons[currentFace];
 
-        if(spd < 550){
-            setTimeout(spin,spd);
+        idx   = (idx + 1) % seq.length;
+
+        delay += 20;       // 점점 느려지는 효과
+        count++;
+
+        if(count < maxCount){
+            setTimeout(spin, delay);
         } else {
-            const final = seq[Math.floor(Math.random()*3)];
-            ledImg.src = icons[final];
-
-            const machine = mapTo[final];
-            const out = judge(player,machine);
-
-            const boxes = document.querySelectorAll(".status-box");
-            boxes.forEach(b=>b.classList.remove("on"));
-
-            if(out==="win"){
-                const gain = getRPSreward();
-                coins += gain;
-                localStorage.setItem("coins",coins);
-                boxes.forEach(b=>{ if(b.classList.contains("win")) b.classList.add("on"); });
-                alert(`이겼다!! +${gain}`);
-            } else if(out==="draw"){
-                coins += 1;
-                localStorage.setItem("coins",coins);
-                boxes.forEach(b=>{ if(b.classList.contains("draw")) b.classList.add("on"); });
-                alert("비겼다 .. +1");
-            } else {
-                coins -= 1;
-                localStorage.setItem("coins",coins);
-                boxes.forEach(b=>{ if(b.classList.contains("lose")) b.classList.add("on"); });
-                alert("졌다 ㅠㅠ -1");
-            }
-
-            localStorage.setItem("coins", coins);
-            document.getElementById("coinBoxRPS").innerText    = `엽전 : ${coins}개`;
-            document.getElementById("coinBoxTicket").innerText = `엽전 : ${coins}개`;
-            spinningR = false;
+            // 마지막 LED 이미지를 고정 → 결과를 이것으로 판단
+            const machine = currentFace;
+            finishRPS(player, machine);
         }
     }
+
     spin();
+}
+
+function finishRPS(player, machine){
+    // LED 먼저 멈추고 확실히 보여주기
+    ledImg.src = icons[machine];
+
+    // 화면에 LED 최종 이미지 확정 표시 후 결과 텍스트
+    setTimeout(() => {
+
+        const result = judge(player, machine);
+        clearStatusBoxes();
+
+        if(result === "win"){
+            const gain = getRPSreward();
+            coins += gain;
+            localStorage.setItem("coins", coins);
+            document.querySelectorAll(".status-box.win").forEach(b=>b.classList.add("on"));
+        }
+        else if(result === "draw"){
+            coins += 1;
+            localStorage.setItem("coins", coins);
+            document.querySelectorAll(".status-box.draw").forEach(b=>b.classList.add("on"));
+        }
+        else{
+            coins -= 1;
+            localStorage.setItem("coins", coins);
+            document.querySelectorAll(".status-box.lose").forEach(b=>b.classList.add("on"));
+        }
+
+        syncCoins();
+        spinningR = false;
+
+    }, 300); 
 }
 </script>
 
 
 <!-- ========================== -->
-<!-- 🎫 응모권 교환             -->
+<!-- 🎫 응모권 교환 -->
 <!-- ========================== -->
 
 <style>
@@ -1089,7 +1137,7 @@ function startRPS(player){
 
     <div class="coupon-box">
         <b>교환 규칙</b><br><br>
-        • 엽전 3개 → 응모권 1개<br>
+        • 엽전 5개 → 응모권 1개<br>
         • 하루 제한 없음<br><br>
 
         현재 엽전 : <span id="coinCouponNow">0</span> 개<br>
@@ -1120,12 +1168,13 @@ function updateCouponPage(){
 
 function exchangeCoupon(){
 
-    if(coins < 3){
-        alert("엽전이 부족합니다! (3개 필요)");
+    // ▶ 엽전 5개 필요
+    if(coins < 5){
+        alert("엽전이 부족합니다! (5개 필요)");
         return;
     }
 
-    coins -= 3;
+    coins -= 5;
     coupons++;
 
     localStorage.setItem("coins", coins);
@@ -1148,7 +1197,7 @@ function exchangeCoupon(){
 
 
 <!-- ========================== -->
-<!-- 🔋 엽전 충전센터           -->
+<!-- 🔋 엽전 충전센터 -->
 <!-- ========================== -->
 
 <style>
@@ -1163,19 +1212,15 @@ function exchangeCoupon(){
     margin-bottom:5vh;
 }
 
+/* 충전 버튼도 메뉴 버튼과 같은 네온 느낌 */
 .charge-btn{
-    width:65vw;
-    padding:5vw 0;
-    border-radius:3vw;
-    border:.7vw solid #fff;
-    margin:2vh 0;
-    cursor:pointer;
-    font-size:4vw;
-    text-align:center;
+    /* 공통 스타일은 위에서 이미 정의 (menu-btn, charge-btn) */
 }
 
-.free-charge{ background:#4CAF50; color:white; }
-.power-charge{ background:#FF3A3A; color:white; }
+/* 종류별 컬러 */
+.power-charge{ 
+    background:linear-gradient(180deg,#ff8f8f,#ff3e3e);
+}
 
 /* 게이지 */
 #powerBox{
@@ -1217,8 +1262,6 @@ function exchangeCoupon(){
     <div class="back-global" onclick="goScreen('menu')">‹ 메뉴</div>
 
     <div class="charge-title">🔋 엽전 충전센터</div>
-
-    <!-- 응모권 충전 버튼 제거됨 -->
 
     <div class="charge-btn power-charge" onclick="startPowerCharge()">
         ⚡ 파워충전 (하루 3회)
@@ -1314,7 +1357,7 @@ function finishPowerCharge(gauge){
 
 
 <!-- ========================== -->
-<!-- 공통 화면 전환 로직        -->
+<!-- 공통 화면 전환 로직 -->
 <!-- ========================== -->
 
 <script>
@@ -1324,8 +1367,14 @@ function goScreen(name){
     if(target) target.style.display="flex";
 
     if(name==="coupon") updateCouponPage();
-    if(name==="rps")    document.getElementById("coinBoxRPS").innerText    = `엽전 : ${coins}개`;
-    if(name==="ticket") document.getElementById("coinBoxTicket").innerText = `엽전 : ${coins}개`;
+    if(name==="rps"){
+        const rpsBox = document.getElementById("coinBoxRPS");
+        if(rpsBox) rpsBox.innerText = `엽전 : ${coins}개`;
+    }
+    if(name==="ticket"){
+        const ticketBox = document.getElementById("coinBoxTicket");
+        if(ticketBox) ticketBox.innerText = `엽전 : ${coins}개`;
+    }
 }
 
 document.getElementById("btnStart").onclick = ()=>{
