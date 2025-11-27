@@ -32,94 +32,117 @@ body{
     justify-content:center;
     align-items:center;
     flex-direction:column;
-    z-index:1;
 }
 
+/* -------------------------------- */
 /* START 화면 */
+/* -------------------------------- */
 #screen-intro{
-    background:#000 url("https://raw.githubusercontent.com/flora385/floraa/main/IMG_5204.jpeg") center/cover no-repeat;
     display:flex;
-    z-index:9999;
-    position:absolute;
+    justify-content:center;
+    align-items:center;
+    flex-direction:column;
+    position:fixed;
+    inset:0;
+    overflow:hidden;
+    z-index:10;
+    background:#000;
 }
 
+/* START 배경 */
+.intro-bg{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    background:url("https://raw.githubusercontent.com/flora385/floraa/main/IMG_9093.jpeg")
+               center center / cover no-repeat;
+    image-rendering:pixelated;
+    pointer-events:none;
+}
+
+/* START 버튼 */
 .start-btn{
     width:65vw;
     padding:5vw 0;
     font-size:6vw;
-    background:#6b6b6b;
+    background:rgba(255,255,255,0.22);
     border:1vw solid #fff;
     border-radius:3vw;
     color:white;
+    z-index:20;
     text-shadow:0 0 1vw #000;
     animation:introBlink 1.2s infinite;
 }
 @keyframes introBlink{
-    0%{opacity:.6; transform:scale(.97);}
-    50%{opacity:1; transform:scale(1.04);}
-    100%{opacity:.6; transform:scale(.97);}
+    0%{opacity:.55; transform:scale(.97);}
+    50%{opacity:1; transform:scale(1.05);}
+    100%{opacity:.55; transform:scale(.97);}
 }
 
+/* -------------------------------- */
 /* 메뉴 화면 */
-#screen-menu .menu-title{
-    color:#7ffeff;
-    font-size:6vw;
-    margin-bottom:5vh;
-    text-shadow:0 0 1.5vw #00eaff;
+/* -------------------------------- */
+
+/* 메뉴 배경 적용 (수정됨) */
+#screen-menu{
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+    align-items:center;
+
+    background:url("https://raw.githubusercontent.com/flora385/floraa/main/IMG_9094.jpeg")
+               center center / cover no-repeat;
+
+    image-rendering:pixelated;
+    padding-top:10vh;
 }
 
-/* 버튼 공통 (메뉴 / 충전 둘 다 사용) */
+/* 메뉴 선택 글씨 제거 */
+#screen-menu .menu-title{
+    display:none;
+}
+
+/* 픽셀 버튼 */
 .menu-btn,
 .charge-btn{
     width:75vw;
-    padding:5vw 0;
-    border-radius:4vw;
-    margin:2.8vh auto;
-    font-size:4.5vw;
+    padding:4.8vw 0;
+    margin:3vh auto;
+    font-size:4.2vw;
     text-align:center;
+    color:#fff;
     cursor:pointer;
-    color:white;
-    font-weight:600;
-
+    image-rendering:pixelated;
+    border:1vw solid #ffffff;
+    border-radius:0;
     box-shadow:
-        0 0 12px rgba(255,255,255,0.4),
-        0 0 20px rgba(0,0,0,0.45),
-        inset 0 0 10px rgba(255,255,255,0.2);
-
-    border:0.9vw solid rgba(255,255,255,0.8);
-    backdrop-filter:blur(2px);
-    transition:transform .15s, box-shadow .15s;
+        1vw 1vw 0 #000,
+        2vw 2vw 0 #3a3a3a,
+        inset -0.8vw -0.8vw 0 rgba(0,0,0,0.45),
+        inset 0.8vw 0.8vw 0 rgba(255,255,255,0.3);
 }
 .menu-btn:active,
 .charge-btn:active{
-    transform:scale(0.96);
+    transform:translate(1vw,1vw);
     box-shadow:
-        0 0 4px rgba(255,255,255,0.3),
-        inset 0 0 10px rgba(0,0,0,0.3);
+        0 0 0 #000,
+        inset -0.8vw -0.8vw 0 rgba(0,0,0,0.45),
+        inset 0.8vw 0.8vw 0 rgba(255,255,255,0.3);
 }
 
-/* 메뉴 버튼별 색 */
-.menu-ticket{ 
-    background:linear-gradient(180deg,#ffec7d,#ffc938);
-}
-.menu-rps{ 
-    background:linear-gradient(180deg,#ff6b6b,#ff2e2e);
-}
-.menu-coupon{ 
-    background:linear-gradient(180deg,#7ec5ff,#4698ff);
-}
-.menu-charge{ 
-    background:linear-gradient(180deg,#91ff9c,#47d55e);
-}
+.menu-ticket{ background:#f6d75b; }
+.menu-rps   { background:#ff6b6b; }
+.menu-coupon{ background:#6bb4ff; }
+.menu-charge{ background:#72e89c; }
 
-/* 뒤로 버튼 */
 .back-global{
     position:absolute;
     top:2vh;
     left:2vh;
     padding:2vw 3vw;
     background:rgba(255,255,255,0.15);
-    border:.7vw solid white;
+    border:.7vw solid #fff;
     border-radius:2vw;
     font-size:3vw;
     color:white;
@@ -133,30 +156,20 @@ body{
 
 <!-- START 화면 -->
 <div id="screen-intro" class="screen">
+    <div class="intro-bg"></div>
     <div class="start-btn" id="btnStart">GAME START</div>
 </div>
 
 <!-- 메뉴 화면 -->
 <div id="screen-menu" class="screen">
-    <div class="menu-title">메뉴 선택</div>
 
-    <div class="menu-btn menu-ticket" onclick="goScreen('ticket')">
-        🎫 랜덤 티켓 뽑기
-    </div>
+    <!-- (삭제됨) 메뉴 선택 문구 -->
 
-    <div class="menu-btn menu-rps" onclick="goScreen('rps')">
-        ✊ 짱깨뽀 게임
-    </div>
-
-    <div class="menu-btn menu-coupon" onclick="goScreen('coupon')">
-        🎫 응모권 교환
-    </div>
-
-    <div class="menu-btn menu-charge" onclick="goScreen('charge')">
-        🔋 엽전 충전센터
-    </div>
+    <div class="menu-btn menu-ticket" onclick="goScreen('ticket')">🎫 랜덤 티켓 뽑기</div>
+    <div class="menu-btn menu-rps" onclick="goScreen('rps')">✊ 짱깨뽀 게임</div>
+    <div class="menu-btn menu-coupon" onclick="goScreen('coupon')">🎫 응모권 교환</div>
+    <div class="menu-btn menu-charge" onclick="goScreen('charge')">🔋 엽전 충전센터</div>
 </div>
-
 
 <!-- ========================== -->
 <!-- 🎟 티켓 뽑기 화면 -->
@@ -243,19 +256,6 @@ body{
         0 0.6vw 1.2vw rgba(0,0,0,0.8);
 }
 
-/* 슬롯 위쪽 금속 라인 */
-.ticket-exit::before{
-    content:"";
-    position:absolute;
-    left:8%;
-    right:8%;
-    top:-1.4vw;
-    height:0.8vw;
-    background:linear-gradient(to right,#888,#eee,#777);
-    border-radius:999px;
-    opacity:.8;
-}
-
 /* 시간 + LED 영역 */
 .time-area{
     position:absolute;
@@ -267,7 +267,6 @@ body{
     gap:1.2vw;
 }
 
-/* 시간 게이지 */
 .time-bar-wrap{
     width:100%;
     height:2.8vw;
@@ -275,97 +274,12 @@ body{
     border:0.45vw solid #fff;
     background:rgba(0,0,0,0.8);
     overflow:hidden;
-    box-shadow:0 0 0.8vw rgba(0,0,0,0.8);
 }
 .time-bar-inner{
     width:100%;
     height:100%;
     background:linear-gradient(to right,#ffeb3b,#ff9800,#ff5722);
     transform-origin:left center;
-    transform:scaleX(1);
-}
-
-/* LED 텍스트 */
-.led-text{
-    display:inline-block;
-    padding:1vw 1.8vw;
-    border-radius:1.8vw;
-    border:0.45vw solid #fff;
-    background:rgba(255,255,0,0.12);
-    color:#fff;
-    font-size:3.1vw;
-    text-shadow:0 0 1vw #ff0000;
-    box-shadow:0 0 1.2vw rgba(0,0,0,0.9);
-    animation:ledBlink 0.6s infinite;
-}
-@keyframes ledBlink{
-    0%{opacity:.5; transform:scale(0.97);}
-    50%{opacity:1; transform:scale(1.03);}
-    100%{opacity:.5; transform:scale(0.97);}
-}
-
-/* 종이 */
-.long-ticket {
-    position:absolute;
-    top:14%;
-    left:50%;
-    transform:translate(-50%, -10%);
-    width:24vw;
-    max-width:115px;
-    background:white;
-    border-radius:1vw;
-    border:.7vw solid #000;
-    display:flex;
-    flex-direction:column;
-    gap:1vw;
-    padding:2.5vw 3vw;
-    animation:paperDrop 5s cubic-bezier(.22,.68,.42,1) forwards;
-}
-@keyframes paperDrop{
-    0%   { opacity:0; transform:translate(-50%, -25%) rotate(0deg); }
-    18%  { opacity:1; transform:translate(-50%, 0%)  rotate(0.3deg); }
-    100% { opacity:1; transform:translate(-50%, 135%) rotate(1deg); }
-}
-
-/* 각 줄 */
-.ticket-line{
-    font-size:3.3vw;
-    width:100%;
-    padding-bottom:1vw;
-    border-bottom:0.5vw dashed #333;
-}
-
-/* 3D 연타 버튼 */
-.arcade-btn{
-    position:absolute;
-    right:8%;
-    bottom:11%;
-    width:30vw;
-    height:30vw;
-    max-width:140px;
-    max-height:140px;
-    border-radius:50%;
-    background:radial-gradient(circle at 30% 25%, #ffbbbb, #ff5b5b 40%, #b00000 100%);
-    border:0.9vw solid #fdfdfd;
-    box-shadow:
-        0 1.9vw 0 #5a0505,
-        0 0 2.4vw rgba(0,0,0,0.9),
-        inset 0 0 1.6vw rgba(255,255,255,0.35);
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    color:white;
-    font-size:4.3vw;
-    cursor:pointer;
-    z-index:30;
-    transition:transform .07s, box-shadow .07s;
-}
-.arcade-btn:active{
-    transform:translateY(1vw) scale(.95);
-    box-shadow:
-        0 0.7vw 0 #5a0505,
-        0 0 1.4vw rgba(0,0,0,0.9),
-        inset 0 0 1.2vw rgba(255,255,255,0.2);
 }
 
 /* 안내 텍스트 */
@@ -381,6 +295,29 @@ body{
     0%{opacity:.5;}
     50%{opacity:1;}
     100%{opacity:.5;}
+}
+
+/* 연타 버튼 */
+.arcade-btn{
+    position:absolute;
+    right:8%;
+    bottom:11%;
+    width:30vw;
+    height:30vw;
+    max-width:140px;
+    max-height:140px;
+    border-radius:50%;
+    background:radial-gradient(circle at 30% 25%, #ffbbbb, #ff5b5b 40%, #b00000 100%);
+    border:0.9vw solid #fdfdfd;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    color:white;
+    font-size:4.3vw;
+    cursor:pointer;
+}
+.arcade-btn:active{
+    transform:translateY(1vw) scale(.95);
 }
 
 /* 결과 팝업 */
@@ -432,7 +369,6 @@ body{
                 <div class="time-bar-wrap">
                     <div class="time-bar-inner" id="timeBar"></div>
                 </div>
-                <div class="led-text">눌러 ! 눌러 !</div>
             </div>
 
             <div class="tap-guide">👉 여기를 연타!</div>
@@ -443,203 +379,121 @@ body{
 </div>
 
 <script>
-/* 티켓 출력 로직 */
-
-let tapping = false;
-let tapList = [];
-let longTicket = null;
-
-let tapGauge = 0;
-let lastSpawn = 0;
-let tapCountTotal = 0;
-let premiumCount = 0;
-
-const SESSION_MS   = 5000;
-const MIN_INTERVAL = 300;
-
-const timeArea = document.getElementById("timeArea");
-const timeBar  = document.getElementById("timeBar");
-let gaugeStartTime = 0;
-let gaugeRAF = null;
+let tapping=false, tapList=[], longTicket=null;
+let tapGauge=0, lastSpawn=0, tapCountTotal=0, premiumCount=0;
+const SESSION_MS=5000, MIN_INTERVAL=300;
+const timeArea=document.getElementById("timeArea");
+const timeBar=document.getElementById("timeBar");
+let gaugeStartTime=0, gaugeRAF=null;
 
 function startGauge(){
-    gaugeStartTime = performance.now();
-    timeArea.style.display = "flex";
-    timeBar.style.transform = "scaleX(1)";
+    gaugeStartTime=performance.now();
+    timeArea.style.display="flex";
+    timeBar.style.transform="scaleX(1)";
 
-    const loop = (now) => {
-        if (!tapping) {
-            timeArea.style.display = "none";
-            timeBar.style.transform = "scaleX(0)";
-            return;
-        }
-        const elapsed = now - gaugeStartTime;
-        let ratio = Math.max(0, 1 - (elapsed / SESSION_MS));
-        timeBar.style.transform = `scaleX(${ratio})`;
+    const loop=(now)=>{
+        if(!tapping) return;
+        const elapsed=now-gaugeStartTime;
+        const ratio=Math.max(0,1-(elapsed/SESSION_MS));
+        timeBar.style.transform=`scaleX(${ratio})`;
 
-        if (ratio > 0){
-            gaugeRAF = requestAnimationFrame(loop);
-        } else {
-            timeArea.style.display = "none";
-            timeBar.style.transform = "scaleX(0)";
-        }
+        if(ratio>0) gaugeRAF=requestAnimationFrame(loop);
+        else timeArea.style.display="none";
     };
-    gaugeRAF = requestAnimationFrame(loop);
+    gaugeRAF=requestAnimationFrame(loop);
 }
 
 function resetTicketSession(){
-    if (longTicket) {
-        longTicket.remove();
-        longTicket = null;
-    }
-    const modals = document.querySelectorAll(".result-modal");
-    modals.forEach(m => m.remove());
+    if(longTicket){ longTicket.remove(); longTicket=null; }
+    document.querySelectorAll(".result-modal").forEach(m=>m.remove());
 }
 
 function createLongTicket(){
-    longTicket = document.createElement("div");
-    longTicket.className = "long-ticket";
-
-    const line = document.createElement("div");
-    line.className = "ticket-line";
-    line.innerText = "🎟 ????";
-
-    longTicket.appendChild(line);
+    longTicket=document.createElement("div");
+    longTicket.className="long-ticket";
     document.querySelector(".ticket-body").appendChild(longTicket);
 }
 
 function extendLongTicket(text){
     if(!longTicket) return;
-    if(tapList.length >= 10) return;
-
-    const line = document.createElement("div");
-    line.className = "ticket-line";
-    line.innerText = "🎟 " + text;
-
+    if(tapList.length>=10) return;
+    const line=document.createElement("div");
+    line.className="ticket-line";
+    line.innerText="🎟 " + text;
     longTicket.appendChild(line);
 }
 
 function getLowReward(){
-    const r = Math.random();
-    if (r < 0.55){
-        return { text:"꽝", coin:0, premium:false };
-    } else if (r < 0.80){
-        return { text:"음식", coin:0, premium:false };
-    } else {
-        const cRoll = Math.random();
-        const amount = cRoll < 0.7 ? 1 : 2;
-        return { text:`엽전+${amount}`, coin:amount, premium:false };
-    }
+    const r=Math.random();
+    if(r<0.55) return {text:"꽝", coin:0, premium:false};
+    if(r<0.80) return {text:"음식", coin:0, premium:false};
+    const amount=Math.random()<0.7?1:2;
+    return {text:`엽전+${amount}`, coin:amount, premium:false};
 }
 
 /* 확률표 */
 function getTicketReward(){
-    const roll = Math.random();
-
-    if (roll < 0.40){
-        return { text:"꽝", coin:0, premium:false };
+    const roll=Math.random();
+    if(roll<0.40) return {text:"꽝", coin:0, premium:false};
+    if(roll<0.55) return {text:"음식", coin:0, premium:false};
+    if(roll<0.80){
+        const amount=Math.random()<0.7?1:2;
+        return {text:`엽전+${amount}`, coin:amount, premium:false};
     }
-    if (roll < 0.55){
-        return { text:"음식", coin:0, premium:false };
+    if(roll<0.89){
+        const pool=["일노","일노","일노","룸노","행노","빂노","빂노"];
+        return {text:pool[Math.floor(Math.random()*pool.length)], coin:0, premium:true};
     }
-    if (roll < 0.80){
-        const cRoll = Math.random();
-        const amount = cRoll < 0.7 ? 1 : 2;
-        return { text:`엽전+${amount}`, coin:amount, premium:false };
+    if(roll<0.94){
+        const pool=["일레","행레","룸레","빂레","빂레"];
+        return {text:pool[Math.floor(Math.random()*pool.length)], premium:true};
     }
-    if (roll < 0.89){
-        const normalPool = [
-            "일노","일노","일노",
-            "룸노",
-            "행노",
-            "빂노","빂노"
-        ];
-        const text = normalPool[Math.floor(Math.random()*normalPool.length)];
-        return { text, coin:0, premium:true };
+    if(roll<0.975){
+        const pool=["랜템","입","멜로디","랜템","입"];
+        return {text:pool[Math.floor(Math.random()*pool.length)], premium:true};
     }
-    if (roll < 0.94){
-        const rarePool = ["일레","행레","룸레","빂레","빂레"];
-        const text = rarePool[Math.floor(Math.random()*rarePool.length)];
-        return { text, coin:0, premium:true };
-    }
-    if (roll < 0.975){
-        const spPool = ["랜템","입","멜로디","랜템","입"];
-        const text = spPool[Math.floor(Math.random()*spPool.length)];
-        return { text, coin:0, premium:true };
-    }
-    if (roll < 0.995){
-        return { text:"일슈", coin:0, premium:true };
-    }
-    return { text:"빂슈", coin:0, premium:true };
+    if(roll<0.995) return {text:"일슈", premium:true};
+    return {text:"빂슈", premium:true};
 }
 
-/* 티켓 버튼 */
-document.getElementById("tapBtn").onclick = () => {
-    const now = Date.now();
+document.getElementById("tapBtn").onclick=()=>{
+    const now=Date.now();
 
-    if (!tapping) {
-
-        // ▶ 엽전 2개 이상 필요
-        if (typeof coins === "number" && coins < 2){
-            alert("엽전이 2개 이상 있어야 합니다!");
-            return;
-        }
+    if(!tapping){
+        if(coins<2){ alert("엽전이 2개 이상 있어야 합니다!"); return; }
 
         resetTicketSession();
+        coins-=2;
+        localStorage.setItem("coins", coins);
+        syncCoins();
 
-        // ▶ 시작 시 엽전 -2
-        if (typeof coins === "number"){
-            coins -= 2;
-            localStorage.setItem("coins", coins);
-            const rpsBox    = document.getElementById("coinBoxRPS");
-            const ticketBox = document.getElementById("coinBoxTicket");
-            if(rpsBox)    rpsBox.innerText    = `엽전 : ${coins}개`;
-            if(ticketBox) ticketBox.innerText = `엽전 : ${coins}개`;
-        }
-
-        tapping        = true;
-        tapList        = [];
-        tapGauge       = 0;
-        lastSpawn      = 0;
-        tapCountTotal  = 0;
-        premiumCount   = 0;
+        tapping=true;
+        tapList=[];
+        tapGauge=0;
+        lastSpawn=0;
+        premiumCount=0;
 
         createLongTicket();
         startGauge();
 
-        setTimeout(()=>{
-            if(tapping){
-                finishLongTicket();
-            }
-        }, SESSION_MS);
-
+        setTimeout(()=>{ if(tapping) finishLongTicket(); }, SESSION_MS);
         return;
     }
 
-    if (tapList.length >= 10) return;
+    if(tapList.length>=10) return;
 
     tapGauge++;
-    tapCountTotal++;
 
-    if (tapGauge >= 7 && (now - lastSpawn) > MIN_INTERVAL) {
-        lastSpawn = now;
-        tapGauge  = 0;
-
-        if (tapList.length < 10) {
-            let reward = getTicketReward();
-
-            if (reward.premium){
-                const allowThird =
-                    (premiumCount === 2 && Math.random() < 0.15);
-
-                if (premiumCount >= 2 && !allowThird){
-                    const low = getLowReward();
-                    reward = low;
-                } else {
-                    premiumCount++;
-                }
+    if(tapGauge>=7 && (now-lastSpawn)>MIN_INTERVAL){
+        lastSpawn=now;
+        tapGauge=0;
+        if(tapList.length<10){
+            let reward=getTicketReward();
+            if(reward.premium){
+                if(premiumCount>=2){
+                    reward=getLowReward();
+                } else premiumCount++;
             }
-
             tapList.push(reward);
             extendLongTicket("????");
         }
@@ -647,63 +501,37 @@ document.getElementById("tapBtn").onclick = () => {
 };
 
 function finishLongTicket(){
-    tapping = false;
+    tapping=false;
+    if(gaugeRAF) cancelAnimationFrame(gaugeRAF);
 
-    if(gaugeRAF){
-        cancelAnimationFrame(gaugeRAF);
-        gaugeRAF = null;
-    }
-    timeArea.style.display = "none";
-    timeBar.style.transform = "scaleX(0)";
+    const modal=document.createElement("div");
+    modal.className="result-modal";
+    const box=document.createElement("div");
+    box.className="result-box";
+    box.innerHTML="<b>🎟 이번 티켓</b><br><br>";
 
-    const modal = document.createElement("div");
-    modal.className = "result-modal";
+    let bonus=0;
+    tapList.forEach((r,i)=>{
+        box.innerHTML += `${i+1}) ${r.text}<br>`;
+        if(r.coin) bonus+=r.coin;
+    });
 
-    const box = document.createElement("div");
-    box.className = "result-box";
-    box.innerHTML = "<b>🎟 이번에 나온 티켓</b><br><br>";
-
-    let bonusCoins = 0;
-
-    if(tapList.length === 0){
-        box.innerHTML += "이번에는 티켓이 안 나왔어요..! 😢<br>";
-    } else {
-        tapList.forEach((r,i)=>{
-            box.innerHTML += `${i+1}) ${r.text}<br>`;
-            if (r.coin){
-                bonusCoins += r.coin;
-            }
-        });
-    }
-
-    if (bonusCoins > 0){
-        coins += bonusCoins;
+    if(bonus>0){
+        coins+=bonus;
         localStorage.setItem("coins", coins);
-        box.innerHTML += `<br><span style="color:#F7D93A;">엽전 보너스 : +${bonusCoins}개</span><br>`;
+        box.innerHTML += `<br><span style="color:#F7D93A;">엽전 보너스 +${bonus}</span>`;
     }
 
-    const close = document.createElement("div");
-    close.className = "result-close";
-    close.innerText = "닫기";
-
-    close.onclick = () => {
-        modal.remove();
-        if(longTicket){
-            longTicket.remove();
-            longTicket = null;
-        }
-        const rpsBox    = document.getElementById("coinBoxRPS");
-        const ticketBox = document.getElementById("coinBoxTicket");
-        if(rpsBox)    rpsBox.innerText    = `엽전 : ${coins}개`;
-        if(ticketBox) ticketBox.innerText = `엽전 : ${coins}개`;
-    };
+    const close=document.createElement("div");
+    close.className="result-close";
+    close.innerText="닫기";
+    close.onclick=()=>{ modal.remove(); syncCoins(); };
 
     modal.appendChild(box);
     modal.appendChild(close);
     document.body.appendChild(modal);
 }
 </script>
-
 
 <!-- ========================== -->
 <!-- ✊ 짱깨뽀 게임 (원판 고정, LED만 회전) -->
@@ -1021,7 +849,7 @@ function startRPS(player){
     syncCoins();
 
     let idx = 0;
-    let delay = 85;        // 더 빠르게 시작
+    let delay = 80;        // 더 빠르게 시작
     let count = 0;
     let maxCount = 15;     // 회전 길이
 
@@ -1032,7 +860,7 @@ function startRPS(player){
 
         idx   = (idx + 1) % seq.length;
 
-        delay += 20;       // 점점 느려지는 효과
+        delay += 22;       // 점점 느려지는 효과
         count++;
 
         if(count < maxCount){
