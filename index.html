@@ -958,28 +958,72 @@ function getLowReward(){
 }
 
 /* 확률표 */
+
 function getTicketReward(){
-    const roll=Math.random();
-    if(roll<0.40) return {text:"꽝", coin:0, premium:false};
-    if(roll<0.55) return {text:"음식", coin:0, premium:false};
-    if(roll<0.80){
-        const amount=Math.random()<0.7?1:2;
-        return {text:`엽전+${amount}`, coin:amount, premium:false};
+    const roll = Math.random();
+
+    // 41% : 꽝 (0 ~ 0.41)
+    if (roll < 0.41){
+        return { text: "꽝", coin: 0, premium: false };
     }
-    if(roll<0.89){
-        const pool=["일노","일노","일노","룸노","행노","빂노","빂노"];
-        return {text:pool[Math.floor(Math.random()*pool.length)], coin:0, premium:true};
+
+    // 20% : 음식 (0.41 ~ 0.61)
+    if (roll < 0.61){
+        return { text: "음식", coin: 0, premium: false };
     }
-    if(roll<0.94){
-        const pool=["일레","행레","룸레","빂레","빂레"];
-        return {text:pool[Math.floor(Math.random()*pool.length)], coin:0, premium:true};
+
+    // 18% : 엽전 (0.61 ~ 0.79)
+    if (roll < 0.79){
+        const amount = Math.random() < 0.7 ? 1 : 2;
+        return { text: `엽전+${amount}`, coin: amount, premium: false };
     }
-    if(roll<0.975){
-        const pool=["랜템","입","멜로디","랜템","입"];
-        return {text:pool[Math.floor(Math.random()*pool.length)], coin:0, premium:true};
+
+    // 10% : 노말 티켓 (0.79 ~ 0.89)
+    if (roll < 0.89){
+        const pool = [
+            "일노","일노","일노","일노",
+            "빂노","빂노","빂노","빂노",
+            "룸노","행노"
+        ];
+        return {
+            text: pool[Math.floor(Math.random() * pool.length)],
+            coin: 0,
+            premium: true
+        };
     }
-    if(roll<0.995) return {text:"일슈", coin:0, premium:true};
-    return {text:"빂슈", coin:0, premium:true};
+
+    // 5% : 레어 티켓 (0.89 ~ 0.94)
+    if (roll < 0.94){
+        const pool = [
+            "일레",
+            "행레",
+            "룸레",
+            "빂레","빂레","빂레"
+        ];
+        return {
+            text: pool[Math.floor(Math.random() * pool.length)],
+            coin: 0,
+            premium: true
+        };
+    }
+
+    // 5.92% : 상위템 (0.94 ~ 0.9992)
+    if (roll < 0.9992){
+        const pool = ["랜템","입","멜로디","랜템","입"];
+        return {
+            text: pool[Math.floor(Math.random() * pool.length)],
+            coin: 0,
+            premium: true
+        };
+    }
+
+    // 0.05% : 일슈 (0.9992 ~ 0.9997)
+    if (roll < 0.9997){
+        return { text: "일슈", coin: 0, premium: true };
+    }
+
+    // 0.03% : 빂슈 (0.9997 ~ 1.0)
+    return { text: "빂슈", coin: 0, premium: true };
 }
 
 document.getElementById("tapBtn").onclick=()=>{
